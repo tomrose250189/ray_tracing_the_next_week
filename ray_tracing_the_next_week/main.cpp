@@ -58,10 +58,10 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img012.ppm");
-   int nx = 200;
-   int ny = 100;
-   int ns = 20;
+   std::ofstream fo("img001.ppm");
+   int nx = 400;
+   int ny = 200;
+   int ns = 50;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    hitable *world = random_scene();
    vec3 lookfrom(13.0, 2.0, 3.0);
