@@ -9,7 +9,6 @@
 
 #define MAXFLOAT 1.99999988079071044921875e127
 
-//Chapter 1
 hitable *random_scene() {
    int n = 50000;
    hitable **list = new hitable*[n+1];
@@ -39,6 +38,16 @@ hitable *random_scene() {
    return new hitable_list(list, i);
 }
 
+hitable *two_spheres() 
+{
+	texture *checker = new checker_texture(new constant_texture(vec3(0.2, 0.3, 0.1)), new constant_texture(vec3(0.9, 0.9, 0.9)));
+	int n = 50;
+	hitable **list = new hitable*[n+1];
+	list[0] = new sphere(vec3(0.0,-10.0,0.0), 10.0, new lambertian(checker));
+	list[1] = new sphere(vec3(0.0, 10.0, 0.0), 10.0, new lambertian(checker));
+	return new hitable_list(list, 2);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
@@ -60,9 +69,9 @@ vec3 color(const ray& r, hitable *world, int depth) {
 
 int main(){
    std::ofstream fo("img001.ppm");
-   int nx = 200;
-   int ny = 100;
-   int ns = 20;
+   int nx = 400;
+   int ny = 200;
+   int ns = 50;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    hitable *world = random_scene();
    vec3 lookfrom(13.0, 2.0, 3.0);
