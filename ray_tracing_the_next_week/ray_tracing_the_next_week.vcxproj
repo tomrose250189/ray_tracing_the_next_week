@@ -130,6 +130,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="vec3.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="img002.ppm" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

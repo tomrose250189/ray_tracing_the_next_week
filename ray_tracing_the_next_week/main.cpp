@@ -68,12 +68,13 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img001.ppm");
+   std::ofstream fo("img002.ppm");
    int nx = 400;
    int ny = 200;
    int ns = 50;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
-   hitable *world = random_scene();
+   //hitable *world = random_scene();
+   hitable *world = two_spheres();
    vec3 lookfrom(13.0, 2.0, 3.0);
    vec3 lookat(0.0, 0.0, 0.0);
    float dist_to_focus = 10.0;
