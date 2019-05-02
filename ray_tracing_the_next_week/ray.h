@@ -1,8 +1,7 @@
 #ifndef RAY_H_INCLUDED
 #define RAY_H_INCLUDED
 #include "vec3.h"
-
-std::function<float()> rn = std::bind(std::uniform_real_distribution<float>(), std::default_random_engine());
+#include "rng.h"
 
 class ray {
 public:
