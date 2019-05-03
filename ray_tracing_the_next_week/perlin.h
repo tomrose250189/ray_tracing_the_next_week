@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <math.h>
 #include "vec3.h"
 #include "rng.h"
 
@@ -38,9 +39,6 @@ public:
 		float u = p.x() - floor(p.x());
 		float v = p.y() - floor(p.y());
 		float w = p.z() - floor(p.z());
-		//int i = int(4 * p.x()) & 255;
-		//int j = int(4 * p.y()) & 255;
-		//int k = int(4 * p.z()) & 255;
 		int i = floor(p.x());
 		int j = floor(p.y());
 		int k = floor(p.z());
@@ -50,6 +48,19 @@ public:
 				for (int dk = 0; dk < 2; ++dk)
 					c[di][dj][dk] = ranvec[perm_x[(i + di) & 255] ^ perm_y[(j + dj) & 255] ^ perm_z[(k + dk) & 255]];
 		return perlin_interp(c, u, v, w);
+	}
+	float turb(const vec3& p, int depth=7) const
+	{
+		float accum = 0;
+		vec3 temp_p = p;
+		float weight = 1.0;
+		for (int i = 0; i < depth; ++i)
+		{
+			accum += weight * noise(temp_p);
+			weight *= 0.5;
+			temp_p *= 2;
+		}
+		return fabs(accum);
 	}
 	static vec3 *ranvec;
 	static int *perm_x, *perm_y, *perm_z;

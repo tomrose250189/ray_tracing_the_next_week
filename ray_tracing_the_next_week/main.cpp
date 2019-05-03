@@ -47,7 +47,7 @@ hitable *two_spheres()
 
 hitable *two_perlin_spheres()
 {
-	texture *pertext = new noise_texture(1.0);
+	texture *pertext = new noise_texture(2.0);
 	hitable **list = new hitable*[2];
 	list[0] = new sphere(vec3(0.0, -1000.0, 0.0), 1000.0, new lambertian(pertext));
 	list[1] = new sphere(vec3(0.0, 2.0, 0.0), 2.0, new lambertian(pertext));
@@ -74,7 +74,7 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img006.ppm");
+   std::ofstream fo("img007.ppm");
    int nx = 400;
    int ny = 200;
    int ns = 50;
