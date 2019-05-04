@@ -5,6 +5,8 @@
 #include "material.h"
 
 #define MAXFLOAT 1.99999988079071044921875e127
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 hitable *random_scene() {
    int n = 50000;
@@ -54,6 +56,16 @@ hitable *two_perlin_spheres()
 	return new hitable_list(list,2);
 }
 
+hitable *image_texture_test_scene()
+{
+	int nx, ny, nn;
+	unsigned char *tex_data = stbi_load("simpsons.jpg", &nx, &ny, &nn, 0);
+	material *mat = new lambertian(new image_texture(tex_data, nx, ny));
+	hitable **list = new hitable*[1];
+	list[0] = new sphere(vec3(0.0, 0.0, 0.0), 5.0, mat);
+	return new hitable_list(list, 1);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
@@ -61,7 +73,7 @@ vec3 color(const ray& r, hitable *world, int depth) {
       vec3 attenuation;
       if((depth < 50) && (rec.mat_ptr->scatter(r, rec, attenuation, scattered))) {
          return attenuation*color(scattered, world, depth+1);
-      }
+	  }
       else{
          return vec3(0, 0, 0);
       }
@@ -74,17 +86,18 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img007.ppm");
+   std::ofstream fo("img009.ppm");
    int nx = 400;
    int ny = 200;
    int ns = 50;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    //hitable *world = random_scene();
    //hitable *world = two_spheres();
-   hitable *world = two_perlin_spheres();
-   vec3 lookfrom(13.0, 2.0, 3.0);
+   //hitable *world = two_perlin_spheres();
+   hitable *world = image_texture_test_scene();
+   vec3 lookfrom(33.0, 2.0, 3.0);
    vec3 lookat(0.0, 0.0, 0.0);
-   float dist_to_focus = 10.0;
+   float dist_to_focus = 30.0;
    float aperture = 0.0;
    camera cam(lookfrom, lookat, vec3(0.0, 1.0, 0.0), 20, float(nx)/float(ny), aperture, dist_to_focus, 0.0, 1.0);
    for(int j = ny-1; j >= 0; j--){

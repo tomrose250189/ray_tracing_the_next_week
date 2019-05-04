@@ -3,6 +3,17 @@
 
 #include "hitable.h"
 
+#define M_PI 3.14159
+
+void get_sphere_uv(const vec3& p, float& u, float& v)
+{
+	float phi = atan2(p.z(), p.x());
+	float theta = asin(p.y());
+	u = 1 - (phi + M_PI) / (2 * M_PI);
+	v = (theta + M_PI / 2) / M_PI;
+	return;
+}
+
 class sphere: public hitable {
 public:
    sphere() {}
@@ -27,6 +38,7 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const 
          rec.p = r.point_at_parameter(rec.t);
          rec.normal = (rec.p - center)/radius;
          rec.mat_ptr = mat_ptr;
+		 get_sphere_uv((rec.p - center)/radius, rec.u, rec.v);
          return true;
       }
       temp = (-b+sqrt(discriminant))/a;
@@ -35,6 +47,7 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const 
          rec.p = r.point_at_parameter(rec.t);
          rec.normal = (rec.p - center)/radius;
          rec.mat_ptr = mat_ptr;
+		 get_sphere_uv((rec.p - center) / radius, rec.u, rec.v);
          return true;
       }
    }
