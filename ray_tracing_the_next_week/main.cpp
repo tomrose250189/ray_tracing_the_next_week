@@ -1,5 +1,6 @@
 #include <fstream>
 #include "sphere.h"
+#include "rectangle.h"
 #include "hitable_list.h"
 #include "camera.h"
 #include "material.h"
@@ -66,27 +67,37 @@ hitable *image_texture_test_scene()
 	return new hitable_list(list, 1);
 }
 
+hitable *simple_light()
+{
+	texture *pertext = new noise_texture(4.0);
+	hitable **list = new hitable*[4];
+	list[0] = new sphere(vec3(0.0, -1000.0, 0.0), 1000.0, new lambertian(pertext));
+	list[1] = new sphere(vec3(0.0, 2.0, 0.0), 2.0, new lambertian(pertext));
+	list[2] = new sphere(vec3(0.0, 7.0, 0.0), 2.0, new diffuse_light(new constant_texture(vec3(4.0, 4.0, 4.0))));
+	list[3] = new xy_rect(3.0, 5.0, 1.0, 3.0, -2.0, new diffuse_light(new constant_texture(vec3(4.0, 4.0, 4.0))));
+	return new hitable_list(list, 4);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
       ray scattered;
       vec3 attenuation;
+	  vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
       if((depth < 50) && (rec.mat_ptr->scatter(r, rec, attenuation, scattered))) {
-         return attenuation*color(scattered, world, depth+1);
+         return emitted + attenuation*color(scattered, world, depth+1);
 	  }
       else{
-         return vec3(0, 0, 0);
+         return emitted;
       }
    }
    else{
-      vec3 unit_direction = unit_vector(r.direction());
-      float t = 0.5*(unit_direction.y() + 1.0);
-      return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+	   return vec3(0.0, 0.0, 0.0);
    }
 }
 
 int main(){
-   std::ofstream fo("img009.ppm");
+   std::ofstream fo("img010.ppm");
    int nx = 400;
    int ny = 200;
    int ns = 50;
@@ -94,10 +105,11 @@ int main(){
    //hitable *world = random_scene();
    //hitable *world = two_spheres();
    //hitable *world = two_perlin_spheres();
-   hitable *world = image_texture_test_scene();
-   vec3 lookfrom(33.0, 2.0, 3.0);
+   //hitable *world = image_texture_test_scene();
+   hitable *world = simple_light();
+   vec3 lookfrom(13.0, 2.0, 3.0);
    vec3 lookat(0.0, 0.0, 0.0);
-   float dist_to_focus = 30.0;
+   float dist_to_focus = 10.0;
    float aperture = 0.0;
    camera cam(lookfrom, lookat, vec3(0.0, 1.0, 0.0), 20, float(nx)/float(ny), aperture, dist_to_focus, 0.0, 1.0);
    for(int j = ny-1; j >= 0; j--){
