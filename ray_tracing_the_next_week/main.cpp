@@ -1,6 +1,6 @@
 #include <fstream>
 #include "sphere.h"
-#include "rectangle.h"
+#include "box.h"
 #include "hitable_list.h"
 #include "camera.h"
 #include "material.h"
@@ -80,7 +80,7 @@ hitable *simple_light()
 
 hitable *cornell_box()
 {
-	hitable **list = new hitable*[6];
+	hitable **list = new hitable*[8];
 	int i = 0;
 	material *red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
 	material *white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
@@ -92,6 +92,8 @@ hitable *cornell_box()
 	list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
 	list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
 	list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
+	list[i++] = new box(vec3(130, 0, 65), vec3(295, 165,230), white);
+	list[i++] = new box(vec3(265, 0, 295), vec3(430, 330, 460), white);
 	return new hitable_list(list, i);
 }
 
@@ -114,10 +116,10 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img012.ppm");
-   int nx = 400;
-   int ny = 200;
-   int ns = 70;
+   std::ofstream fo("img013.ppm");
+   int nx = 1000;
+   int ny = 500;
+   int ns = 100;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    //hitable *world = random_scene();
    //hitable *world = two_spheres();
