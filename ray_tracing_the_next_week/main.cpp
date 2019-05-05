@@ -78,6 +78,23 @@ hitable *simple_light()
 	return new hitable_list(list, 4);
 }
 
+hitable *cornell_box()
+{
+	hitable **list = new hitable*[6];
+	int i = 0;
+	material *red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+	material *white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+	material *green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+	material *light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
+	list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
+	list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
+	list[i++] = new xz_rect(213, 343, 227, 332, 554, light);
+	list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
+	list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
+	list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
+	return new hitable_list(list, i);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
@@ -97,21 +114,23 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img010.ppm");
+   std::ofstream fo("img012.ppm");
    int nx = 400;
    int ny = 200;
-   int ns = 50;
+   int ns = 70;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    //hitable *world = random_scene();
    //hitable *world = two_spheres();
    //hitable *world = two_perlin_spheres();
    //hitable *world = image_texture_test_scene();
-   hitable *world = simple_light();
-   vec3 lookfrom(13.0, 2.0, 3.0);
-   vec3 lookat(0.0, 0.0, 0.0);
+   //hitable *world = simple_light();
+   hitable *world = cornell_box();
+   vec3 lookfrom(278.0, 278.0, -800.0);
+   vec3 lookat(278.0, 278.0, 0.0);
    float dist_to_focus = 10.0;
    float aperture = 0.0;
-   camera cam(lookfrom, lookat, vec3(0.0, 1.0, 0.0), 20, float(nx)/float(ny), aperture, dist_to_focus, 0.0, 1.0);
+   float vfov = 40.0;
+   camera cam(lookfrom, lookat, vec3(0.0, 1.0, 0.0), vfov, float(nx)/float(ny), aperture, dist_to_focus, 0.0, 1.0);
    for(int j = ny-1; j >= 0; j--){
       for(int i = 0; i < nx; ++i){
          vec3 col(0, 0, 0);
