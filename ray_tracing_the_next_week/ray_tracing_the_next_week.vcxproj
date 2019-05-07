@@ -133,6 +133,7 @@
     <ClInclude Include="sphere.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="vec3.h" />
+    <ClInclude Include="volumes.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

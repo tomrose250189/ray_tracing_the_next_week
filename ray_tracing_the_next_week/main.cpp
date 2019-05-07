@@ -1,9 +1,9 @@
 #include <fstream>
 #include "sphere.h"
 #include "box.h"
+#include "volumes.h"
 #include "hitable_list.h"
 #include "camera.h"
-#include "material.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -104,6 +104,28 @@ hitable *rotated_box()
 	return new hitable_list(list, 1);
 }
 
+hitable *cornell_smoke()
+{
+	hitable **list = new hitable*[8];
+	int i = 0;
+	material *red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+	material *white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+	material *green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+	material *light = new diffuse_light(new constant_texture(vec3(1
+, 1, 1)));
+	list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
+	list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
+	list[i++] = new xz_rect(113, 443, 127, 432, 554, light);
+	list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
+	list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
+	list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
+	hitable *b1 = new translate(new rotate_y(new box(vec3(0, 0, 0), vec3(165, 165, 165), white), -18), vec3(130, 0, 65));
+	hitable *b2 = new translate(new rotate_y(new box(vec3(0, 0, 0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295));
+	list[i++] = new constant_medium(b1, 0.01, new constant_texture(vec3(1.0, 1.0, 1.0)));
+	list[i++] = new constant_medium(b2, 0.01, new constant_texture(vec3(0.0, 0.0, 0.0)));
+	return new hitable_list(list, i);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
@@ -123,7 +145,7 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img016.ppm");
+   std::ofstream fo("img017.ppm");
    int nx = 800;
    int ny = 400;
    int ns = 500;
@@ -133,8 +155,9 @@ int main(){
    //hitable *world = two_perlin_spheres();
    //hitable *world = image_texture_test_scene();
    //hitable *world = simple_light();
-   hitable *world = cornell_box();
+   //hitable *world = cornell_box();
    //hitable *world = rotated_box();
+   hitable *world = cornell_smoke();
    vec3 lookfrom(278.0, 278.0, -800.0);
    vec3 lookat(278.0, 278.0, 0.0);
    float dist_to_focus = 10.0;

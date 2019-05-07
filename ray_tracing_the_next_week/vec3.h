@@ -42,7 +42,7 @@ public:
 };
 
 std::istream& operator>>(std::istream& is, vec3 &t);
-std::ostream& operator>>(std::ostream& os, const vec3& t);
+std::ostream& operator<<(std::ostream& os, const vec3& t);
 vec3 operator+(const vec3& v1, const vec3& v2);
 vec3 operator-(const vec3& v1, const vec3& v2);
 vec3 operator*(const vec3& v1, const vec3& v2);
