@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <iostream>
 
+#define M_PI 3.14159
+#define MAXFLOAT 1.99999988079071044921875e127
+
 class vec3 {
 public:
    vec3() {}

@@ -3,8 +3,6 @@
 
 #include "hitable.h"
 
-#define M_PI 3.14159
-
 void get_sphere_uv(const vec3& p, float& u, float& v)
 {
 	float phi = atan2(p.z(), p.x());

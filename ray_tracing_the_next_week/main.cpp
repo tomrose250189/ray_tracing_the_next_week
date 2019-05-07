@@ -5,7 +5,6 @@
 #include "camera.h"
 #include "material.h"
 
-#define MAXFLOAT 1.99999988079071044921875e127
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -92,9 +91,17 @@ hitable *cornell_box()
 	list[i++] = new flip_normals(new xz_rect(0, 555, 0, 555, 555, white));
 	list[i++] = new xz_rect(0, 555, 0, 555, 0, white);
 	list[i++] = new flip_normals(new xy_rect(0, 555, 0, 555, 555, white));
-	list[i++] = new box(vec3(130, 0, 65), vec3(295, 165,230), white);
-	list[i++] = new box(vec3(265, 0, 295), vec3(430, 330, 460), white);
+	list[i++] = new translate(new rotate_y(new box(vec3(0, 0, 0), vec3(165, 165, 165), white), -18), vec3(130, 0, 65));
+	list[i++] = new translate(new rotate_y(new box(vec3(0, 0, 0), vec3(165, 330, 165), white), 15), vec3(265, 0, 295));
 	return new hitable_list(list, i);
+}
+
+hitable *rotated_box()
+{
+	hitable **list = new hitable*[1];
+	material *red = new lambertian(new constant_texture(vec3(0.65, 0.05, 0.05)));
+	list[0] = new rotate_y(new translate(new box(vec3(-1, -1, -1), vec3(1, 1, 1), red), vec3(5, 0, 0)), 45);
+	return new hitable_list(list, 1);
 }
 
 vec3 color(const ray& r, hitable *world, int depth) {
@@ -111,15 +118,15 @@ vec3 color(const ray& r, hitable *world, int depth) {
       }
    }
    else{
-	   return vec3(0.0, 0.0, 0.0);
+	   return vec3(0, 0, 0);
    }
 }
 
 int main(){
-   std::ofstream fo("img013.ppm");
-   int nx = 1000;
-   int ny = 500;
-   int ns = 100;
+   std::ofstream fo("img016.ppm");
+   int nx = 800;
+   int ny = 400;
+   int ns = 500;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    //hitable *world = random_scene();
    //hitable *world = two_spheres();
@@ -127,6 +134,7 @@ int main(){
    //hitable *world = image_texture_test_scene();
    //hitable *world = simple_light();
    hitable *world = cornell_box();
+   //hitable *world = rotated_box();
    vec3 lookfrom(278.0, 278.0, -800.0);
    vec3 lookat(278.0, 278.0, 0.0);
    float dist_to_focus = 10.0;
