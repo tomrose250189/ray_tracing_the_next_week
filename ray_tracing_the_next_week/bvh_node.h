@@ -8,10 +8,8 @@
 int box_x_compare(const void *a, const void *b)
 {
 	aabb box_left, box_right;
-	auto ah = (const hitable*)a;
-	auto bh = static_cast<const hitable*>(a);
-	//hitable *ah = *(hitable**)a;
-	//hitable *bh = *(hitable**)b;
+	hitable *ah = *(hitable**)a;
+	hitable *bh = *(hitable**)b;
 	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right)) 
 	{
 		std::cerr << "no bounding box in bvh_node constructor\n";
@@ -28,11 +26,9 @@ int box_x_compare(const void *a, const void *b)
 int box_y_compare(const void *a, const void *b)
 {
 	aabb box_left, box_right;
-	auto ah = (const hitable*)a;
-	auto bh = static_cast<const hitable*>(a);
-	//hitable *ah = *(hitable**)a;
-	//hitable *bh = *(hitable**)b;
-	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right))
+	hitable *ah = *(hitable**)a;
+	hitable *bh = *(hitable**)b;
+	if (!(ah->bounding_box(0, 0, box_left)) || !(bh->bounding_box(0, 0, box_right)))
 	{
 		std::cerr << "no bounding box in bvh_node constructor\n";
 	}
@@ -48,10 +44,8 @@ int box_y_compare(const void *a, const void *b)
 int box_z_compare(const void *a, const void *b)
 {
 	aabb box_left, box_right;
-	auto ah = (const hitable*)a;
-	auto bh = static_cast<const hitable*>(a);
-	//hitable *ah = *(hitable**)a;
-	//hitable *bh = *(hitable**)b;
+	hitable *ah = *(hitable**)a;
+	hitable *bh = *(hitable**)b;
 	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right))
 	{
 		std::cerr << "no bounding box in bvh_node constructor\n";
@@ -70,7 +64,7 @@ class bvh_node : public hitable
 {
 public:
 	bvh_node() = default;
-	bvh_node(hitable **l, int n, float time0, float time1);
+	bvh_node(hitable **l, int n, float time0, float time1, bool sort_nodes = true);
 	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
 	virtual bool bounding_box(float t0, float t1, aabb& box) const override;
 	hitable *left;
@@ -78,20 +72,22 @@ public:
 	aabb box;
 };
 
-bvh_node::bvh_node(hitable **l, int n, float time0, float time1)
+bvh_node::bvh_node(hitable **l, int n, float time0, float time1, bool sort_nodes)
 {
-	int axis = int(3 * rn());
-	if(axis == 0)
-	{
-		qsort(l, n, sizeof(hitable*), box_x_compare);
-	}
-	else if(axis == 1)
-	{
-		qsort(l, n, sizeof(hitable*), box_y_compare);
-	}
-	else
-	{
-		qsort(l, n, sizeof(hitable*), box_z_compare);
+	if (sort_nodes) {
+		int axis = int(3 * rn());
+		if (axis == 0)
+		{
+			qsort(l, n, sizeof(hitable*), box_x_compare);
+		}
+		else if (axis == 1)
+		{
+			qsort(l, n, sizeof(hitable*), box_y_compare);
+		}
+		else
+		{
+			qsort(l, n, sizeof(hitable*), box_z_compare);
+		}
 	}
 	if(n == 1)
 	{
@@ -104,8 +100,8 @@ bvh_node::bvh_node(hitable **l, int n, float time0, float time1)
 	}
 	else
 	{
-		left = new bvh_node(l, n / 2, time0, time1);
-		right = new bvh_node(l + n / 2, time0, time1);
+		left = new bvh_node(l, n / 2, time0, time1, false);
+		right = new bvh_node(l + n / 2, n - n / 2, time0, time1, false);
 	}
 	aabb box_left, box_right;
 	if (!left->bounding_box(time0, time1, box_left) || !right->bounding_box(time0, time1, box_right)) 

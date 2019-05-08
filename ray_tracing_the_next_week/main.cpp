@@ -4,6 +4,7 @@
 #include "volumes.h"
 #include "hitable_list.h"
 #include "camera.h"
+#include "bvh_node.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -126,6 +127,54 @@ hitable *cornell_smoke()
 	return new hitable_list(list, i);
 }
 
+hitable *final()
+{
+	int nb = 20;
+	hitable **list = new hitable*[30];
+	hitable **boxlist = new hitable*[10000];
+	hitable **boxlist2 = new hitable*[10000];
+	material *white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+	material *ground = new lambertian(new constant_texture(vec3(0.48, 0.83, 0.53)));
+	int b = 0;
+	for (int i = 0; i < nb; ++i) {
+		for (int j = 0; j < nb; ++j) {
+			float w = 100;
+			float x0 = -1000 + i*w;
+			float z0 = -1000 + j*w;
+			float y0 = 0;
+			float x1 = x0 + w;
+			float y1 = 100*(rn() + 0.01);
+			float z1 = z0 + w;
+			boxlist[b++] = new box(vec3(x0, y0, z0), vec3(x1, y1, z1), ground);
+		}
+	}
+	int l = 0;
+	list[l++] = new bvh_node(boxlist, b, 0, 1);
+	material *light = new diffuse_light(new constant_texture(vec3(2, 2, 2)));
+	list[l++] = new xz_rect(123, 423, 147, 412, 554, light);
+	vec3 center(400, 400, 200);
+	list[l++] = new moving_sphere(center, center + vec3(30, 0, 0), 0, 1, 50, new lambertian(new constant_texture(vec3(0.7, 0.3, 0.1))));
+	list[l++] = new sphere(vec3(260, 150, 45), 50, new dielectric(1.5));
+	list[l++] = new sphere(vec3(0, 150, 145), 50, new metal(vec3(0.8, 0.8, 0.9), 10.0));
+	hitable *boundary = new sphere(vec3(360, 150, 145), 70, new dielectric(1.5));
+	list[l++] = boundary;
+	list[l++] = new constant_medium(boundary, 0.2, new constant_texture(vec3(0.2, 0.4, 0.9)));
+	boundary = new sphere(vec3(0, 0, 0), 5000, new dielectric(1.5));
+	list[l++] = new constant_medium(boundary, 0.0001, new constant_texture(vec3(1.0, 1.0, 1.0)));
+	int nx, ny, nn;
+	unsigned char *tex_data = stbi_load("simpsons.jpg", &nx, &ny, &nn, 0);
+	material *emat = new lambertian(new image_texture(tex_data, nx, ny));
+	list[l++] = new sphere(vec3(400, 200, 400), 100, emat);
+	texture *pertext = new noise_texture(2.0);
+	list[l++] = new sphere(vec3(220, 280, 300), 80, new lambertian(pertext));
+	int ns = 1000;
+	for (int j = 0; j < ns; ++j) {
+		boxlist2[j] = new sphere(vec3(165*rn(), 165*rn(), 165*rn()), 10, white);
+	}
+	list[l++] = new translate(new rotate_y(new bvh_node(boxlist2, ns, 0.0, 1.0), 15), vec3(-100, 270, 395));
+	return new hitable_list(list, l);
+}
+
 vec3 color(const ray& r, hitable *world, int depth) {
    hit_record rec;
    if(world->hit(r, 0.001, MAXFLOAT, rec)){
@@ -145,9 +194,9 @@ vec3 color(const ray& r, hitable *world, int depth) {
 }
 
 int main(){
-   std::ofstream fo("img017.ppm");
-   int nx = 800;
-   int ny = 400;
+   std::ofstream fo("img020.ppm");
+   int nx = 400;
+   int ny = 600;
    int ns = 500;
    fo << "P3\n" << nx << " " << ny << "\n255\n";
    //hitable *world = random_scene();
@@ -157,12 +206,13 @@ int main(){
    //hitable *world = simple_light();
    //hitable *world = cornell_box();
    //hitable *world = rotated_box();
-   hitable *world = cornell_smoke();
-   vec3 lookfrom(278.0, 278.0, -800.0);
+   //hitable *world = cornell_smoke();
+   hitable *world = final();
+   vec3 lookfrom(425.0, 278.0, -400.0);
    vec3 lookat(278.0, 278.0, 0.0);
    float dist_to_focus = 10.0;
    float aperture = 0.0;
-   float vfov = 40.0;
+   float vfov = 60.0;
    camera cam(lookfrom, lookat, vec3(0.0, 1.0, 0.0), vfov, float(nx)/float(ny), aperture, dist_to_focus, 0.0, 1.0);
    for(int j = ny-1; j >= 0; j--){
       for(int i = 0; i < nx; ++i){
