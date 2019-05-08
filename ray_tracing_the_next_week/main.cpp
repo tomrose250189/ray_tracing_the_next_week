@@ -150,7 +150,7 @@ hitable *final()
 	}
 	int l = 0;
 	list[l++] = new bvh_node(boxlist, b, 0, 1);
-	material *light = new diffuse_light(new constant_texture(vec3(2, 2, 2)));
+	material *light = new diffuse_light(new constant_texture(vec3(1, 1, 1)));
 	list[l++] = new xz_rect(123, 423, 147, 412, 554, light);
 	vec3 center(400, 400, 200);
 	list[l++] = new moving_sphere(center, center + vec3(30, 0, 0), 0, 1, 50, new lambertian(new constant_texture(vec3(0.7, 0.3, 0.1))));
@@ -165,7 +165,7 @@ hitable *final()
 	unsigned char *tex_data = stbi_load("simpsons.jpg", &nx, &ny, &nn, 0);
 	material *emat = new lambertian(new image_texture(tex_data, nx, ny));
 	list[l++] = new sphere(vec3(400, 200, 400), 100, emat);
-	texture *pertext = new noise_texture(2.0);
+	texture *pertext = new noise_texture(1.0);
 	list[l++] = new sphere(vec3(220, 280, 300), 80, new lambertian(pertext));
 	int ns = 1000;
 	for (int j = 0; j < ns; ++j) {
@@ -208,7 +208,7 @@ int main(){
    //hitable *world = rotated_box();
    //hitable *world = cornell_smoke();
    hitable *world = final();
-   vec3 lookfrom(425.0, 278.0, -400.0);
+   vec3 lookfrom(425.0, 278.0, -500.0);
    vec3 lookat(278.0, 278.0, 0.0);
    float dist_to_focus = 10.0;
    float aperture = 0.0;
